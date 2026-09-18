@@ -288,6 +288,51 @@ input::placeholder, textarea::placeholder { color: var(--gray-md); }
 @keyframes toastIn  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 @keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
 
+/* Mobile foundation: keep controls reachable without changing desktop layout. */
+@media (max-width: 768px) {
+  html { overflow-x: hidden; }
+  body { min-width: 320px; overflow-x: hidden; }
+  .navbar {
+    min-height: 64px; height: auto; padding: 10px 14px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .nav-brand { font-size: 16px; }
+  .role-chip { padding: 4px 8px; }
+  .nav-tabs {
+    display: flex; order: 3; width: 100%; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { min-height: 44px; padding: 10px 14px; }
+  .logout-btn { min-height: 44px; padding: 10px 12px; }
+  .page-wrapper { padding: 24px 14px; }
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: clamp(26px, 8vw, 32px); }
+  .page-sub { font-size: 14px; }
+  .card { padding: 20px 16px; }
+  .btn, .action-btn, .edit-btn, .delete-btn,
+  .add-btn, .assign-btn, .deliver-btn,
+  .confirm-receipt-btn, .review-order-btn { min-height: 44px; }
+  .toast { max-width: calc(100vw - 28px); white-space: normal; text-align: center; }
+  .modal-overlay { padding: 12px; align-items: flex-start; overflow-y: auto; }
+  .modal-overlay > * { margin: auto 0; max-height: calc(100vh - 24px); overflow-y: auto; }
+  .status-progress { overflow-x: auto; padding-bottom: 4px; }
+  .status-step { min-width: 62px; }
+  .status-step-label { white-space: normal; }
+}
+
+@media (max-width: 480px) {
+  .nav-brand .role-chip { display: none; }
+  .navbar .notif-bell-wrap { margin-left: auto; }
+  .search-wrap, .search-input { width: 100%; }
+  .page-wrapper { padding-left: 12px; padding-right: 12px; }
+  .order-card, .delivery-card { padding: 16px; }
+  .order-card-header, .delivery-header { align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .order-amounts { gap: 8px 14px; }
+  .order-actions { width: 100%; }
+  .order-actions > * { flex: 1 1 100%; }
+}
+
 /* ── Auth message types ────────────────────────────────────────── */
 .auth-msg.success { color: var(--green); }
 .auth-msg.error   { color: var(--red); }

@@ -138,6 +138,17 @@
   box-shadow: var(--shadow-sm);
 }
 
+@media (max-width: 480px) {
+  .nav-right { gap: 6px !important; }
+  .nav-right .stat-pill { display: none; }
+  .nav-right .logout-btn { font-size: 0; padding: 10px; }
+  .nav-right .logout-btn .material-symbols-rounded { margin-right: 0 !important; font-size: 20px; }
+  .delivery-header, .delivery-body { padding-left: 16px; padding-right: 16px; }
+  .info-grid { gap: 10px; }
+  .receipt-box-row { gap: 12px; }
+  .receipt-box-row span:first-child { min-width: 0; }
+}
+
 .driver-action-info {
   background: #eef6fb;
 }

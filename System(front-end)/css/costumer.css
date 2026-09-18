@@ -446,6 +446,23 @@
   gap: 18px;
 }
 
+@media (max-width: 768px) {
+  .menu-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .cart-fab { right: 14px; bottom: 14px; min-height: 48px; padding: 12px 16px; }
+  .cart-body { padding-left: 16px; padding-right: 16px; }
+  .cart-footer { padding-left: 16px; padding-right: 16px; }
+}
+
+@media (max-width: 480px) {
+  .menu-cards-grid { grid-template-columns: 1fr; }
+  .order-card { padding: 16px; }
+  .receipt-body { padding: 20px 16px; }
+  .receipt-top { padding: 24px 16px 18px; }
+  .review-modal-body, .product-reviews-body { padding-left: 16px; padding-right: 16px; }
+  .cart-item { align-items: flex-start; }
+  .cart-item-qty { gap: 5px; }
+}
+
 /* ── Cancel order button ── */
 .cancel-order-btn {
   margin-top: 10px;

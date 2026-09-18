@@ -211,3 +211,11 @@
   color: var(--orange-dk);
   font-weight: 800;
 }
+
+@media (max-width: 480px) {
+  .right-panel { padding: 20px 12px; align-items: flex-start; }
+  .auth-box { padding: 26px 18px; border-radius: 18px; margin: 12px 0; }
+  .auth-box h2 { font-size: 28px; }
+  .subtitle { margin-bottom: 22px; }
+  .hero-text h1 { font-size: 38px; }
+}

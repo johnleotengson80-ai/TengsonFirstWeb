@@ -311,3 +311,22 @@
 .confirm-actions {
   margin-top: 22px;
 }
+
+@media (max-width: 768px) {
+  .form-grid { gap: 12px; }
+  .product-grid, .menu-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .product-img { height: 130px; }
+  .product-info { padding: 12px; }
+  .product-name { font-size: 15px; }
+  .product-actions { flex-direction: column; }
+  .edit-btn, .delete-btn { width: 100%; }
+  .add-form-card { max-width: none; }
+  .upload-placeholder { padding: 28px 16px; }
+}
+
+@media (max-width: 480px) {
+  .product-grid, .menu-cards-grid { grid-template-columns: 1fr; }
+  .product-img { height: 170px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .page-header > div[style] { width: 100%; align-items: stretch !important; flex-direction: column; }
+}
