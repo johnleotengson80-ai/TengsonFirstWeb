@@ -435,6 +435,49 @@
   .search-input { width: 100%; min-width: 0; }
 }
 
+@media (max-width: 560px) {
+  .customer-navbar {
+    grid-template-areas:
+      "brand bell logout"
+      "tabs tabs tabs";
+    grid-template-columns: minmax(0, 1fr) 40px 40px;
+    grid-template-rows: auto auto;
+    align-items: center;
+    row-gap: 8px;
+  }
+
+  .customer-navbar .nav-brand { grid-area: brand; }
+  .customer-navbar .notif-bell-wrap { grid-area: bell; }
+  .customer-navbar .logout-btn { grid-area: logout; }
+  .customer-navbar .nav-tabs {
+    grid-area: tabs;
+    display: flex;
+    width: 100%;
+    min-height: 42px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .customer-navbar .nav-tab {
+    flex: 1 0 auto;
+    min-width: max-content;
+  }
+
+  .driver-banner {
+    position: relative;
+    z-index: 1;
+    margin-top: 12px;
+  }
+
+  .driver-banner-inner {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+}
+
 @media (max-width: 480px) {
   .menu-grid { grid-template-columns: minmax(0, 1fr); }
   .search-input { width: 100%; }
