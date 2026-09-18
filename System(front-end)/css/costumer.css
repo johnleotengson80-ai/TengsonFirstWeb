@@ -526,7 +526,9 @@
 }
 
 .menu-card-img {
+  height: clamp(140px, 18vw, 220px);
   min-height: 140px;
+  max-height: 220px;
 }
 
 .cart-sidebar {
