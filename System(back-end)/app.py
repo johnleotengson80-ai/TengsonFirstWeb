@@ -99,6 +99,11 @@ def create_app():
     def index():
         return {'message': 'Hi Te! API is running', 'status': 'ok'}
 
+    @app.route('/api/')
+    @app.route('/api')
+    def api_index():
+        return {'message': 'Hi Te! API is running', 'status': 'ok'}
+
     return app
 
 
