@@ -384,6 +384,13 @@ body { display: flex; padding-bottom: 0; }
   .top-product-info { min-width: calc(100% - 48px); }
   .top-product-bar-wrap { flex-basis: 100%; }
   .notif-dropdown { right: -8px; width: min(340px, calc(100vw - 24px)); }
+  .assign-card { padding: 12px; min-width: 0; overflow: hidden; }
+  .assign-order-id, .assign-order-meta, .assign-order-amounts {
+    overflow-wrap: anywhere;
+  }
+  .assign-row { width: 100%; min-width: 0; }
+  .assign-select, .assign-btn { width: 100%; min-width: 0; max-width: 100%; }
+  .assign-btn { white-space: normal; }
 }
 
 .stat-card {

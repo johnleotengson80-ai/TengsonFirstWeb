@@ -904,6 +904,35 @@ button .material-symbols-rounded {
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Final narrow-viewport cascade: browser zoom reduces the CSS viewport, so
+   header controls must wrap before they can force cards off-screen. */
+@media (max-width: 560px) {
+  .navbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    padding: 8px 10px;
+    min-height: 56px;
+  }
+  .nav-brand { min-width: 0; gap: 6px; font-size: 14px; }
+  .brand-icon { width: 30px; height: 30px; font-size: 11px; }
+  .navbar .notif-bell-wrap { margin-left: 0; }
+  .notif-bell-btn { padding: 4px; }
+  .notif-bell-btn .material-symbols-rounded { font-size: 22px; }
+  .logout-btn {
+    min-height: 38px; padding: 7px 8px; font-size: 0;
+    white-space: nowrap;
+  }
+  .logout-btn .material-symbols-rounded { margin-right: 0 !important; font-size: 20px; }
+  .nav-tabs {
+    grid-column: 1 / -1; order: 4; width: 100%;
+    min-width: 0; padding: 2px; gap: 2px;
+  }
+  .nav-tab { flex: 0 0 auto; min-height: 38px; padding: 8px 10px; font-size: 12px; }
+  .page-header[style] { align-items: stretch !important; }
+  .page-header[style] > div { min-width: 0; }
+}
+
 .notif-badge.visible {
   transform: scale(1);
 }
