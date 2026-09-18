@@ -437,6 +437,7 @@
 
 @media (max-width: 560px) {
   .customer-navbar {
+    display: grid !important;
     grid-template-areas:
       "brand bell logout"
       "tabs tabs tabs";
@@ -446,12 +447,13 @@
     row-gap: 8px;
   }
 
-  .customer-navbar .nav-brand { grid-area: brand; }
-  .customer-navbar .notif-bell-wrap { grid-area: bell; }
-  .customer-navbar .logout-btn { grid-area: logout; }
+  .customer-navbar > .nav-brand { grid-area: brand !important; }
+  .customer-navbar > .notif-bell-wrap { grid-area: bell !important; }
+  .customer-navbar > .logout-btn { grid-area: logout !important; }
   .customer-navbar .nav-tabs {
-    grid-area: tabs;
+    grid-area: tabs !important;
     display: flex;
+    order: initial;
     width: 100%;
     min-height: 42px;
     max-width: 100%;
