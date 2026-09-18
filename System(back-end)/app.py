@@ -75,6 +75,9 @@ def create_app():
 
     db.init_app(app)
     JWTManager(app)
+    with app.app_context():
+        db.create_all()
+
     CORS(
         app,
         origins=_cors_origins(),
@@ -109,8 +112,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        db.create_all()
-        print('[OK] Database tables ready!')
     print('[SERVER] Running on http://localhost:5000')
     app.run(debug=os.getenv('FLASK_DEBUG', '').lower() == 'true', port=5000, threaded=True)
