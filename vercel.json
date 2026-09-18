@@ -8,6 +8,11 @@
     {"src": "/api/(.*)", "dest": "/api/index.py"},
     {"src": "/uploads/(.*)", "dest": "/api/index.py"},
     {"src": "/", "dest": "/System(front-end)/html/index.html"},
+    {"src": "/(index|register|admin|driver|seller|costumer|customer)\\.html", "dest": "/System(front-end)/html/$1.html"},
+    {"src": "/html/(.*)", "dest": "/System(front-end)/html/$1"},
+    {"src": "/css/(.*)", "dest": "/System(front-end)/css/$1"},
+    {"src": "/js/(.*)", "dest": "/System(front-end)/js/$1"},
+    {"src": "/fonts/(.*)", "dest": "/System(front-end)/fonts/$1"},
     {"src": "/(.*)", "dest": "/System(front-end)/$1"}
   ]
 }
