@@ -18,6 +18,10 @@ Public registration always creates customer accounts. To create the first admin,
 
 After signing in, the existing admin users endpoint/dashboard can create seller and driver accounts (as well as customer or admin accounts). Do not use public registration to create privileged roles.
 
+## One-time existing-admin password reset
+
+If an existing admin row is present but its password is unknown, temporarily add the exact case-sensitive Vercel Production variables `BOOTSTRAP_ADMIN_RESET_USERNAME`, `BOOTSTRAP_ADMIN_RESET_PASSWORD`, and `BOOTSTRAP_ADMIN_RESET_CONFIRM=true`, then redeploy. The reset runs only when the confirmation value is exactly `true`; it fails if the username is missing, does not exist, or belongs to a non-admin. It replaces only the existing admin's bcrypt password hash and logs no values or passwords. Verify admin login with the reset password, remove all `BOOTSTRAP_ADMIN_RESET_*` variables (and any temporary `BOOTSTRAP_ADMIN_*` variables), then redeploy. Reset is disabled for every other confirmation value.
+
 ## Limitations and setup
 
 Vercel functions are stateless and have ephemeral filesystems. Product images written to `/tmp/uploads` can disappear between invocations, so durable uploads require an external object-storage service and a small change to `_save_image` in `System(back-end)/routes/products.py`. The current SSE implementation is process-local and is not durable or shared across serverless instances; dashboards retain their existing polling refresh and SSE should be treated as best-effort notifications.

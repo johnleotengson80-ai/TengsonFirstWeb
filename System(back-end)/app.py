@@ -97,6 +97,38 @@ def _bootstrap_admin():
     return 'created'
 
 
+def _reset_admin_password():
+    username = (os.getenv('BOOTSTRAP_ADMIN_RESET_USERNAME') or '').strip()
+    password = os.getenv('BOOTSTRAP_ADMIN_RESET_PASSWORD')
+    confirmed = os.getenv('BOOTSTRAP_ADMIN_RESET_CONFIRM') == 'true'
+    if not confirmed:
+        return 'disabled'
+    if not username or not password:
+        raise RuntimeError(
+            'BOOTSTRAP_ADMIN_RESET_USERNAME and BOOTSTRAP_ADMIN_RESET_PASSWORD '
+            'must be set when BOOTSTRAP_ADMIN_RESET_CONFIRM=true.'
+        )
+    password_bytes = password.encode('utf-8')
+    if not password_bytes or len(password_bytes) > 72:
+        raise RuntimeError(
+            'BOOTSTRAP_ADMIN_RESET_PASSWORD must be between 1 and 72 UTF-8 bytes.'
+        )
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        raise RuntimeError('Bootstrap reset username does not exist.')
+    if user.role != 'admin':
+        raise RuntimeError('Bootstrap reset username is not an admin.')
+
+    user.password_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8')
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        raise RuntimeError('Bootstrap admin password reset failed.') from error
+    return 'reset'
+
+
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = _database_uri()
@@ -115,12 +147,19 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all()
+        reset_status = _reset_admin_password()
         bootstrap_status = _bootstrap_admin()
         app.logger.warning(
-            '[bootstrap] status=%s username_present=%s password_present=%s',
+            '[bootstrap] status=%s username_present=%s password_present=%s '
+            'reset_status=%s reset_username_present=%s reset_password_present=%s '
+            'reset_confirm_present=%s',
             bootstrap_status,
             bool(os.getenv('BOOTSTRAP_ADMIN_USERNAME')),
             bool(os.getenv('BOOTSTRAP_ADMIN_PASSWORD')),
+            reset_status,
+            bool(os.getenv('BOOTSTRAP_ADMIN_RESET_USERNAME')),
+            bool(os.getenv('BOOTSTRAP_ADMIN_RESET_PASSWORD')),
+            os.getenv('BOOTSTRAP_ADMIN_RESET_CONFIRM') == 'true',
         )
 
     CORS(
