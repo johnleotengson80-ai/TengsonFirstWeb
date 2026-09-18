@@ -1,6 +1,6 @@
 const API   = window.API_BASE_URL;
-const getToken = () => localStorage.getItem('token_seller');
-const getUser  = () => JSON.parse(localStorage.getItem('user_seller') || '{}');
+const getToken = () => localStorage.getItem('token');
+const getUser  = () => JSON.parse(localStorage.getItem('user') || '{}');
 if (!getToken()) location.href = '../html/index.html';
 
 let products  = [];
@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function logout() {
-  localStorage.removeItem('token_seller');
-  localStorage.removeItem('user_seller');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
   location.href = '../html/index.html';
 }
 
@@ -55,8 +55,8 @@ function handleUnauthorized() {
   showToast('⚠️ Session expired. Redirecting...', 'error', 2000);
 
   setTimeout(() => {
-    localStorage.removeItem('token_seller');
-    localStorage.removeItem('user_seller');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     location.href = '../html/index.html';
   }, 2000);
 }
