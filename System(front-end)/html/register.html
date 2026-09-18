@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi Te! — Create Account</title>
+  <link rel="stylesheet" href="../css/shared.css?v=6">
+  <link rel="stylesheet" href="../css/style.css?v=6">
+  <link rel="stylesheet" href="../css/register.css?v=6">
+  <link rel="stylesheet" href="../css/material-symbols.css" />
+</head>
+<body>
+  <div class="split-layout">
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="brand">
+        <div class="brand-icon">HT</div>
+        <span class="brand-name">Hi Te!</span>
+      </div>
+      <div class="hero-text">
+        <h1>Join the<br><span class="accent">Hi Te!</span><br>family.</h1>
+        <p>Order from the best local restaurants and get food delivered in minutes.</p>
+      </div>
+      <div class="role-info-cards">
+        <div class="ri-card">
+          <span><span class="material-symbols-rounded">schedule</span></span>
+          <div><strong>Fast Delivery</strong><p>Get your food in 30 minutes or less</p></div>
+        </div>
+        <div class="ri-card">
+          <span><span class="material-symbols-rounded">credit_card</span></span>
+          <div><strong>Easy Payment</strong><p>GCash, PayMaya, or Cash on Delivery</p></div>
+        </div>
+        <div class="ri-card">
+          <span>📍</span>
+          <div><strong>Live Tracking</strong><p>Track your order status in real time</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="auth-box reg-box anim-up">
+        <h2>Create account</h2>
+        <p class="subtitle">Sign up to start ordering food</p>
+
+        <form id="registerForm">
+          <div class="reg-grid">
+
+            <div class="field-group">
+              <label>Username <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon"><span class="material-symbols-rounded">account_circle</span></span>
+                <input type="text" id="username"
+                  placeholder="Choose a username"
+                  autocomplete="username" required>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Password <span class="req">*</span></label>
+              <!-- Password with toggle -->
+              <div class="input-wrap" style="position:relative">
+                <span class="input-icon"><span class="material-symbols-rounded">lock</span></span>
+                <input type="password" id="password"
+                  placeholder="Create a password"
+                  autocomplete="new-password" required
+                  style="padding-right:48px">
+                <button type="button" class="pw-toggle"
+                  onclick="togglePassword('password', this)"
+                  title="Show/hide password">
+                 <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Full Name</label>
+              <div class="input-wrap">
+                <span class="input-icon"><span class="material-symbols-rounded">badge</span></span>
+                <input type="text" id="full_name"
+                  placeholder="Your full name"
+                  autocomplete="name">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Email</label>
+              <div class="input-wrap">
+                <span class="input-icon"><span class="material-symbols-rounded">mail</span></span>
+                <input type="email" id="email"
+                  placeholder="your@email.com"
+                  autocomplete="email">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Phone</label>
+              <div class="input-wrap">
+                <span class="input-icon"><span class="material-symbols-rounded">call</span></span>
+                <input type="text" id="phone"
+                  placeholder="+63 912 345 6789"
+                  autocomplete="tel">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Delivery Address</label>
+              <div class="input-wrap">
+                <span class="input-icon"><span class="material-symbols-rounded">location_on</span></span>
+                <input type="text" id="address"
+                  placeholder="Your delivery address"
+                  autocomplete="street-address">
+              </div>
+            </div>
+
+          </div>
+
+          <p id="msg" class="auth-msg"></p>
+
+          <button type="submit" id="register-btn"
+            class="btn btn-primary btn-full btn-lg">
+            <span id="register-btn-label">Create Account</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </form>
+
+        <p class="switch-text">
+          Already have an account? <a href="index.html">Sign in</a>
+        </p>
+
+        <p class="info-note">
+          🏪 Are you a seller or driver?
+          Contact the administrator to get your account set up.
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <script src="../js/config.js?v=7"></script>
+  <script src="../js/register.js?v=7"></script>
+</body>
+</html>

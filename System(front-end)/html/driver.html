@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi Te! — Driver Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css?v=6">
+  <link rel="stylesheet" href="../css/driver.css?v=6">
+  <link rel="stylesheet" href="../css/material-symbols.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">HT</div>
+      <span>Hi Te!</span>
+      <span class="role-chip chip-driver">Driver</span>
+    </div>
+    <div class="nav-tabs" style="display:flex;gap:10px;justify-content:center;flex:1">
+      <button class="nav-tab active" onclick="showTab('deliveries', this)"><span class="material-symbols-rounded" style="margin-right:4px;">local_shipping</span> Deliveries</button>
+      <button class="nav-tab" onclick="showTab('profile', this)"><span class="material-symbols-rounded" style="margin-right:4px;">account_circle</span> Profile</button>
+    </div>
+    <div class="nav-right" style="display:flex;align-items:center;gap:12px">
+      <div class="stat-pill">
+        <span id="stat-active" class="pill-num">0</span> active
+        &nbsp;·&nbsp;
+        <span id="stat-done" class="pill-num">0</span> delivered
+      </div>
+      <div class="notif-bell-wrap" id="notif-bell-wrap">
+        <button class="notif-bell-btn" onclick="toggleNotifPanel()" title="Notifications">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="notif-badge" id="notif-badge">0</span>
+        </button>
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-dropdown-header">
+            <h3>Notifications</h3>
+            <button class="notif-clear-btn" onclick="clearNotifications()">Clear all</button>
+          </div>
+          <div class="notif-dropdown-body" id="notif-list">
+            <div class="notif-empty"><span class="material-symbols-rounded">notifications_off</span>No notifications yet</div>
+          </div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()"><span class="material-symbols-rounded" style="margin-right:4px;">logout</span> Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper" style="max-width:780px">
+    <div id="tab-deliveries" class="tab-content active">
+      <div class="page-header">
+        <h1 class="page-title">Your <span class="accent">Deliveries</span></h1>
+        <p class="page-sub">Assigned orders appear here automatically — refreshes every 30 seconds</p>
+      </div>
+      <div id="deliveries-container">
+        <div class="loading-state"><div class="spinner"></div><p>Loading deliveries...</p></div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div id="tab-profile" class="tab-content">
+      <div class="page-header">
+        <h1 class="page-title">My <span class="accent">Profile</span></h1>
+        <p class="page-sub">Update your personal information and change your password</p>
+      </div>
+
+      <div class="form-card" style="margin-bottom:24px">
+        <h2 style="font-family:var(--font-head);font-size:18px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span class="material-symbols-rounded" style="color:var(--orange)">badge</span> Personal Info
+        </h2>
+        <div class="form-grid">
+          <div class="field-group">
+            <label>Full Name</label>
+            <input type="text" id="profile-name" placeholder="John Doe">
+          </div>
+          <div class="field-group">
+            <label>Email Address</label>
+            <input type="email" id="profile-email" placeholder="john@example.com">
+          </div>
+          <div class="field-group">
+            <label>Phone Number</label>
+            <input type="text" id="profile-phone" placeholder="09123456789">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Address</label>
+            <textarea id="profile-address" rows="3" placeholder="Your full address"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg" style="margin-top:16px" onclick="saveProfile()">
+          <span class="material-symbols-rounded">save</span> Save Changes
+        </button>
+        <div id="profile-msg" style="margin-top:12px;font-size:13px;font-weight:600"></div>
+      </div>
+
+      <div class="form-card">
+        <h2 style="font-family:var(--font-head);font-size:18px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span class="material-symbols-rounded" style="color:var(--orange)">lock</span> Change Password
+        </h2>
+        <div class="form-grid">
+          <div class="field-group">
+            <label>Current Password</label>
+            <div style="position:relative">
+              <input type="password" id="pw-old" placeholder="Your current password" style="padding-right:48px">
+              <button type="button" class="pw-toggle" onclick="togglePassword('pw-old', this)" title="Show/hide password">
+                 <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>New Password</label>
+            <div style="position:relative">
+              <input type="password" id="pw-new" placeholder="At least 6 characters" style="padding-right:48px">
+              <button type="button" class="pw-toggle" onclick="togglePassword('pw-new', this)" title="Show/hide password">
+                 <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-lg" style="margin-top:8px" onclick="changePassword()">
+          <span class="material-symbols-rounded">key</span> Change Password
+        </button>
+        <div id="pw-msg" style="margin-top:12px;font-size:13px;font-weight:600"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js?v=7"></script>
+  <script src="../js/driver.js?v=7"></script>
+  <script src="../js/sync.js?v=7"></script>
+</body>
+</html>

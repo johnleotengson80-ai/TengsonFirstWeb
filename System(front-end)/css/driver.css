@@ -1,0 +1,143 @@
+.nav-right { display: flex; align-items: center; gap: 14px; }
+
+.stat-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gray-lt); border-radius: 30px;
+  padding: 8px 16px; font-size: 13px; color: var(--dark); font-weight: 500;
+}
+
+.pill-num { font-family: var(--font-head); font-weight: 800; color: var(--orange); }
+
+/* ── Delivery cards ────────────────────────────────────────────── */
+#deliveries-container { display: flex; flex-direction: column; gap: 16px; }
+
+.delivery-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-lt); overflow: hidden;
+  transition: all 0.2s;
+}
+
+.delivery-card:hover { box-shadow: var(--shadow); }
+.delivery-card.active-delivery { border-color: var(--orange); }
+
+.delivery-header {
+  padding: 18px 24px; display: flex;
+  justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--gray-lt);
+}
+
+.delivery-id { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--dark); }
+
+.delivery-body { padding: 20px 24px; }
+
+/* Receipt box shown to driver */
+.receipt-box {
+  background: var(--cream); border-radius: var(--radius-sm);
+  padding: 16px; margin-bottom: 16px;
+  border: 1px solid var(--gray-lt);
+}
+
+.receipt-box-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--gray); margin-bottom: 10px;
+}
+
+.receipt-box-row {
+  display: flex; justify-content: space-between;
+  font-size: 14px; padding: 5px 0;
+  border-bottom: 1px solid var(--gray-lt);
+  color: var(--dark);
+}
+
+.receipt-box-row:last-child { border-bottom: none; }
+.receipt-box-row span:last-child { font-weight: 600; }
+
+.receipt-box-total {
+  display: flex; justify-content: space-between;
+  padding: 10px 0 4px; margin-top: 6px;
+  border-top: 2px solid var(--dark);
+}
+
+.receipt-box-total span:first-child { font-weight: 700; color: var(--dark); }
+.receipt-box-total span:last-child { font-family: var(--font-head); font-size: 18px; font-weight: 800; color: var(--orange); }
+
+.ref-badge {
+  display: inline-block; background: rgba(255,107,43,0.1); color: var(--orange);
+  border-radius: var(--radius-sm); padding: 8px 14px; margin-bottom: 14px;
+  font-size: 13px; font-weight: 600;
+}
+
+.info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;
+}
+
+.info-item { display: flex; flex-direction: column; gap: 3px; }
+.info-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray); }
+.info-value { font-size: 14px; font-weight: 500; color: var(--dark); }
+
+.est-time-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,107,43,0.1); color: var(--orange);
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.deliver-btn {
+  width: 100%; padding: 15px;
+  background: var(--orange); color: white;
+  border: none; border-radius: var(--radius);
+  font-family: var(--font-head); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.25s; letter-spacing: -0.2px;
+}
+
+.deliver-btn:hover { background: var(--dark); transform: translateY(-2px); box-shadow: var(--shadow); }
+
+.delivered-box {
+  text-align: center; padding: 16px; border-radius: var(--radius);
+  background: rgba(46,204,113,0.08); color: var(--green-dk); font-weight: 700; font-size: 15px;
+}
+
+.waiting-box {
+  text-align: center; padding: 14px; border-radius: var(--radius);
+  background: var(--cream); color: var(--gray); font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .stat-pill { display: none; }
+  .info-grid { grid-template-columns: 1fr; }
+}
+
+/* Driver demo polish */
+.page-wrapper {
+  max-width: 860px !important;
+}
+
+.stat-pill {
+  background: #fff4e8;
+  border: 1px solid rgba(217,79,34,0.12);
+}
+
+.delivery-card.active-delivery {
+  border-left: 4px solid var(--orange);
+}
+
+.delivery-header {
+  background: rgba(255,247,237,0.7);
+}
+
+.receipt-box {
+  background: #fffaf1;
+}
+
+.ref-badge,
+.est-time-badge {
+  border: 1px solid rgba(217,79,34,0.14);
+}
+
+.deliver-btn {
+  box-shadow: var(--shadow-sm);
+}
+
+.driver-action-info {
+  background: #eef6fb;
+}

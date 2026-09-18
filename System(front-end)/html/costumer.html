@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi Te! — Order Food</title>
+  <link rel="stylesheet" href="../css/shared.css?v=6">
+  <link rel="stylesheet" href="../css/costumer.css?v=6">
+  <link rel="stylesheet" href="../css/material-symbols.css" />
+</head>
+<body>
+
+  <!-- Toast notification container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">HT</div>
+      <span>Hi Te!</span>
+      <span class="role-chip chip-customer">Customer</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('menu', this)"><span class="material-symbols-rounded" style="margin-right:4px;">restaurant</span> Menu</button>
+      <button class="nav-tab" onclick="showTab('orders', this)"><span class="material-symbols-rounded" style="margin-right:4px;">receipt_long</span> My Orders</button>
+      <button class="nav-tab" onclick="showTab('profile', this)"><span class="material-symbols-rounded" style="margin-right:4px;">account_circle</span> Profile</button>
+    </div>
+    <div class="notif-bell-wrap" id="notif-bell-wrap">
+      <button class="notif-bell-btn" onclick="toggleNotifPanel()" title="Notifications">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge" id="notif-badge">0</span>
+      </button>
+      <div class="notif-dropdown" id="notif-dropdown">
+        <div class="notif-dropdown-header">
+          <h3>Notifications</h3>
+          <button class="notif-clear-btn" onclick="clearNotifications()">Clear all</button>
+        </div>
+        <div class="notif-dropdown-body" id="notif-list">
+          <div class="notif-empty"><span class="material-symbols-rounded">notifications_off</span>No notifications yet</div>
+        </div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()"><span class="material-symbols-rounded" style="margin-right:4px;">logout</span> Sign Out</button>
+  </nav>
+
+  <!-- Driver availability banner -->
+  <div id="driver-banner" class="driver-banner">
+    <div id="driver-banner-inner" class="driver-banner-inner">
+      <div class="spinner" style="width:22px;height:22px;border-width:2px;margin:0;flex-shrink:0"></div>
+      <span>Checking driver availability...</span>
+    </div>
+  </div>
+
+  <!-- ── MENU TAB ── -->
+  <div id="tab-menu" class="tab-content active">
+    <div class="page-wrapper">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px">
+        <div>
+          <h1 class="page-title">What are you <span class="accent">craving?</span></h1>
+          <p class="page-sub">Fresh food, delivered fast</p>
+        </div>
+        <!-- Search bar -->
+        <div class="search-wrap">
+          <span class="search-icon"><span class="material-symbols-rounded">search</span></span>
+          <input type="text" id="menu-search" class="search-input"
+            placeholder="Search food..." oninput="filterMenu(this.value)">
+        </div>
+      </div>
+      <div id="menu-grid" class="menu-grid">
+        <div class="loading-state"><div class="spinner"></div><p>Loading menu...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MY ORDERS TAB ── -->
+  <div id="tab-orders" class="tab-content">
+    <div class="page-wrapper">
+      <div class="page-header">
+        <h1 class="page-title">My <span class="accent">Orders</span></h1>
+        <p class="page-sub">Track your food in real time</p>
+      </div>
+      <div id="order-history" class="orders-list">
+        <div class="loading-state"><div class="spinner"></div><p>Loading orders...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFILE TAB ── -->
+  <div id="tab-profile" class="tab-content">
+    <div class="page-wrapper">
+      <div class="page-header">
+        <h1 class="page-title">My <span class="accent">Profile</span></h1>
+        <p class="page-sub">Update your info and delivery address</p>
+      </div>
+      <div class="add-form-card card" style="max-width:520px">
+        <h3 style="margin:0 0 20px;font-size:16px;font-weight:600">Personal Information</h3>
+        <div class="form-grid">
+          <div class="field-group">
+            <label>Full Name</label>
+            <input type="text" id="profile-name" placeholder="Your full name">
+          </div>
+          <div class="field-group">
+            <label>Email</label>
+            <input type="email" id="profile-email" placeholder="your@email.com">
+          </div>
+          <div class="field-group">
+            <label>Phone</label>
+            <input type="text" id="profile-phone" placeholder="e.g. 09xxxxxxxxx">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <label>Delivery Address</label>
+            <input type="text" id="profile-address" placeholder="Your delivery address">
+            <span class="field-hint">This is used as your default delivery address when placing orders</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg" style="margin-top:8px" onclick="saveProfile()">
+          Save Changes
+        </button>
+        <p id="profile-msg" style="margin-top:12px;font-size:13px;min-height:18px;font-weight:500"></p>
+
+        <div style="border-top:1px solid var(--border);margin:24px 0"></div>
+        <h3 style="margin:0 0 20px;font-size:16px;font-weight:600">Change Password</h3>
+        <div class="form-grid">
+          <div class="field-group">
+            <label>Current Password</label>
+            <div style="position:relative">
+              <input type="password" id="pw-old" placeholder="Your current password" style="padding-right:48px">
+              <button type="button" class="pw-toggle" onclick="togglePassword('pw-old', this)" title="Show/hide password">
+                 <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+              </button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>New Password</label>
+            <div style="position:relative">
+              <input type="password" id="pw-new" placeholder="At least 6 characters" style="padding-right:48px">
+              <button type="button" class="pw-toggle" onclick="togglePassword('pw-new', this)" title="Show/hide password">
+                 <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-lg" style="margin-top:8px" onclick="changePassword()">
+          Change Password
+        </button>
+        <p id="pw-msg" style="margin-top:12px;font-size:13px;min-height:18px;font-weight:500"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CART OVERLAY ── -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+  <!-- ── CART SIDEBAR ── -->
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <div>
+        <h3>Your Order</h3>
+        <span id="cart-item-count" class="cart-count-label">0 items</span>
+      </div>
+      <button class="close-cart" onclick="toggleCart()">✕</button>
+    </div>
+
+    <!-- Cart items -->
+    <div class="cart-body" id="cart-items">
+      <div class="cart-empty-state">
+        <div class="cart-empty-icon"></div>
+        <div class="cart-empty-title">Your cart is empty</div>
+        <p class="cart-empty-sub">Add items from the menu to get started</p>
+      </div>
+    </div>
+
+    <!-- Cart footer — only shown when cart has items -->
+    <div class="cart-footer" id="cart-footer" style="display:none">
+
+      <!-- Order note input -->
+      <div class="note-wrap">
+        <input type="text" id="order-note" class="note-input"
+          placeholder="Add a note (e.g. no onions, extra rice)">
+      </div>
+
+      <!-- Price summary -->
+      <div class="order-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="s-subtotal">₱0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Rider Fee</span>
+          <span id="s-rider-fee">₱49.00</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-total">
+          <span>Total</span>
+          <span id="s-total">₱49.00</span>
+        </div>
+      </div>
+
+      <!-- Payment method -->
+      <div class="pay-section">
+        <p class="pay-label">Payment Method</p>
+        <div class="pay-options">
+          <label class="pay-opt">
+            <input type="radio" name="payment" value="cod" onchange="onPaymentChange(this)">
+            <span>Cash on Delivery</span>
+          </label>
+          <label class="pay-opt">
+            <input type="radio" name="payment" value="pickup" onchange="onPaymentChange(this)">
+            <span>Pick Up</span>
+          </label>
+          <label class="pay-opt">
+            <input type="radio" name="payment" value="online" onchange="onPaymentChange(this)">
+            <span>Online Payment</span>
+          </label>
+        </div>
+
+        <!-- Online sub-options -->
+        <div id="online-sub" class="online-sub" style="display:none">
+          <p class="pay-label" style="margin-top:12px;margin-bottom:8px">Select Platform</p>
+          <div class="pay-options">
+            <label class="pay-opt">
+              <input type="radio" name="online_method" value="gcash">
+              <span>GCash</span>
+            </label>
+            <label class="pay-opt">
+              <input type="radio" name="online_method" value="paymaya">
+              <span>PayMaya</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Place order button with loading state -->
+      <button class="btn btn-orange btn-full btn-lg" id="place-order-btn"
+        style="margin-top:16px" onclick="placeOrder()">
+        <span id="place-order-label">Place Order</span>
+        <span id="place-order-arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Floating cart FAB -->
+  <button class="cart-fab" id="cart-fab" style="display:none" onclick="toggleCart()">
+    <span class="cart-fab-icon"></span>
+    <span id="cart-count">0</span> items
+    <span class="cart-fab-dot">·</span>
+    <span id="fab-total">₱0</span>
+  </button>
+
+  <!-- ── RECEIPT MODAL ── -->
+  <div class="modal-overlay" id="receipt-overlay" style="display:none">
+    <div class="receipt-modal">
+      <div class="receipt-top">
+        <div class="receipt-brand">
+          <div class="brand-icon" style="width:32px;height:32px;font-size:12px">HT</div>
+          Hi Te!
+        </div>
+        <h2 class="receipt-title">Order Confirmed!</h2>
+        <p class="receipt-sub" id="receipt-ref"></p>
+      </div>
+      <div class="receipt-body" id="receipt-body"></div>
+      <div style="padding:0 28px 28px;display:flex;gap:12px">
+        <button class="btn btn-ghost btn-lg" style="flex:1" onclick="printReceipt()">
+          Print
+        </button>
+        <button class="btn btn-primary btn-lg" style="flex:1" onclick="closeReceipt()">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REVIEW MODAL ── -->
+  <div class="modal-overlay" id="review-overlay" style="display:none">
+    <div class="review-modal">
+      <div class="review-modal-header">
+        <h3 class="review-modal-title">Rate Your Order</h3>
+        <p class="review-modal-sub">How was your experience? Your feedback helps others!</p>
+      </div>
+
+      <div class="review-modal-body" id="review-items-list">
+        <!-- Filled dynamically by JS -->
+      </div>
+
+      <div style="padding:0 24px 24px;display:flex;gap:12px">
+        <button class="btn btn-ghost btn-lg" style="flex:1" onclick="closeReviewModal()">
+          Maybe Later
+        </button>
+        <button class="btn btn-orange btn-lg" style="flex:1" id="submit-reviews-btn"
+          onclick="submitAllReviews()">
+          Submit Reviews
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRODUCT REVIEWS MODAL ── -->
+  <div class="modal-overlay" id="product-reviews-overlay" style="display:none">
+    <div class="product-reviews-modal">
+      <div class="product-reviews-header">
+        <h3 id="product-reviews-title">Reviews</h3>
+        <button class="close-modal-btn" onclick="closeProductReviews()">✕</button>
+      </div>
+      <div id="product-reviews-body" class="product-reviews-body">
+        <div class="loading-state"><div class="spinner"></div><p>Loading reviews...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js?v=7"></script>
+  <script src="../js/costumer.js?v=7"></script>
+  <script src="../js/sync.js?v=7"></script>
+</body>
+</html>

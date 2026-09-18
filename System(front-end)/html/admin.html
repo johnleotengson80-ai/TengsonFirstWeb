@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi Te! — Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css?v=6">
+  <link rel="stylesheet" href="../css/admin.css?v=6">
+  <!-- Chart.js — no installation needed -->
+  <script src="../js/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../css/material-symbols.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">HT</div>
+      <span>Hi Te!</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" onclick="showSection('overview',this)">
+        Overview
+      </button>
+      <button class="sidebar-item" onclick="showSection('analytics',this)">
+        Analytics
+      </button>
+      <button class="sidebar-item" onclick="showSection('users',this)">
+        Users
+      </button>
+      <button class="sidebar-item" onclick="showSection('orders',this)">
+        Orders
+      </button>
+      <button class="sidebar-item" onclick="showSection('drivers',this)">
+        Assign Drivers
+        <span class="sidebar-badge" id="assign-driver-badge" style="display:none;">0</span>
+      </button>
+    </nav>
+    <button class="sidebar-logout" onclick="logout()">Sign Out</button>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div style="display:flex;justify-content:flex-end;padding:16px 28px 0;gap:12px;align-items:center;">
+      <div class="notif-bell-wrap" id="notif-bell-wrap">
+        <button class="notif-bell-btn" onclick="toggleNotifPanel()" title="Notifications">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="notif-badge" id="notif-badge">0</span>
+        </button>
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-dropdown-header">
+            <h3>Notifications</h3>
+            <button class="notif-clear-btn" onclick="clearNotifications()">Clear all</button>
+          </div>
+          <div class="notif-dropdown-body" id="notif-list">
+            <div class="notif-empty"><span class="material-symbols-rounded">notifications_off</span>No notifications yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <div id="section-overview" class="section active">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard <span class="accent">Overview</span></h1>
+        <p class="page-sub">Monitor your platform at a glance</p>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,107,43,0.1)">U</div>
+          <div>
+            <span id="stat-users" class="stat-num">—</span>
+            <p class="stat-lbl">Total Users</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(46,204,113,0.1)">O</div>
+          <div>
+            <span id="stat-orders" class="stat-num">—</span>
+            <p class="stat-lbl">Total Orders</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(52,152,219,0.1)">P</div>
+          <div>
+            <span id="stat-products" class="stat-num">—</span>
+            <p class="stat-lbl">Products</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(231,76,60,0.1)">N</div>
+          <div>
+            <span id="stat-pending" class="stat-num">—</span>
+            <p class="stat-lbl">Pending Orders</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(46,204,113,0.1)">D</div>
+          <div>
+            <span id="stat-delivered" class="stat-num">—</span>
+            <p class="stat-lbl">Delivered</p>
+          </div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(255,107,43,0.3)">
+          <div class="stat-icon" style="background:rgba(255,107,43,0.1)">R</div>
+          <div>
+            <span id="stat-revenue" class="stat-num" style="color:var(--orange)">—</span>
+            <p class="stat-lbl">Total Revenue</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick charts in overview -->
+      <div class="overview-charts">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Sales This Week</h3>
+            <p>Last 7 days revenue</p>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="weekChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>Orders by Status</h3>
+            <p>All time breakdown</p>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div id="section-analytics" class="section">
+      <div class="page-header">
+        <h1 class="page-title">Sales <span class="accent">Analytics</span></h1>
+        <p class="page-sub">Track your revenue and orders by day, week, month, and year</p>
+      </div>
+
+      <!-- Period tabs -->
+      <div class="analytics-tabs">
+        <button class="analytics-tab active" onclick="switchAnalytics('daily', this)">Daily</button>
+        <button class="analytics-tab" onclick="switchAnalytics('weekly', this)">Weekly</button>
+        <button class="analytics-tab" onclick="switchAnalytics('monthly', this)">Monthly</button>
+        <button class="analytics-tab" onclick="switchAnalytics('yearly', this)">Yearly</button>
+      </div>
+
+      <!-- Summary pills -->
+      <div class="analytics-summary">
+        <div class="summary-pill">
+          <span class="summary-pill-label" id="period-label">Period</span>
+          <span id="period-display" class="summary-pill-value" style="font-size:16px">—</span>
+        </div>
+        <div class="summary-pill">
+          <span class="summary-pill-label">Total Revenue</span>
+          <span id="analytics-revenue" class="summary-pill-value">₱0.00</span>
+        </div>
+        <div class="summary-pill">
+          <span class="summary-pill-label">Total Orders</span>
+          <span id="analytics-orders" class="summary-pill-value">0</span>
+        </div>
+        <div class="summary-pill">
+          <span class="summary-pill-label">Avg per Order</span>
+          <span id="analytics-avg" class="summary-pill-value">₱0.00</span>
+        </div>
+      </div>
+
+      <!-- Date / Year selector row -->
+      <div class="analytics-selector-row">
+        <!-- Daily: date picker -->
+        <div id="selector-daily" class="selector-wrap">
+          <label class="selector-label">Select Date</label>
+          <input type="date" id="daily-date" class="selector-input"
+            onchange="loadAnalytics()">
+        </div>
+        <!-- Weekly: week picker -->
+        <div id="selector-weekly" class="selector-wrap" style="display:none">
+          <label class="selector-label">Select Week</label>
+          <input type="week" id="weekly-week" class="selector-input"
+            onchange="loadAnalytics()">
+        </div>
+        <!-- Monthly: year + month -->
+        <div id="selector-monthly" class="selector-wrap" style="display:none;gap:10px">
+          <label class="selector-label">Select Year & Month</label>
+          <div style="display:flex;gap:10px">
+            <select id="monthly-year" class="selector-input" onchange="loadAnalytics()"></select>
+            <select id="monthly-month" class="selector-input" onchange="loadAnalytics()">
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+        </div>
+        <!-- Yearly: year only -->
+        <div id="selector-yearly" class="selector-wrap" style="display:none">
+          <label class="selector-label">Select Year</label>
+          <select id="yearly-year" class="selector-input" onchange="loadAnalytics()"></select>
+        </div>
+      </div>
+
+      <!-- Revenue chart -->
+      <div class="chart-card" style="margin-bottom:24px">
+        <div class="chart-card-header">
+          <h3 id="revenue-chart-title">Revenue</h3>
+          <p id="revenue-chart-sub">Loading...</p>
+        </div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="analyticsRevenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Orders chart -->
+      <div class="chart-card" style="margin-bottom:24px">
+        <div class="chart-card-header">
+          <h3 id="orders-chart-title">Orders</h3>
+          <p id="orders-chart-sub">Loading...</p>
+        </div>
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="analyticsOrdersChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Top products -->
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Top 5 Best-Selling Products</h3>
+          <p>By quantity sold (completed orders)</p>
+        </div>
+        <div id="top-products-list" style="padding:8px 0">
+          <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div id="section-users" class="section">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+        <div>
+          <h1 class="page-title">Manage <span class="accent">Users</span></h1>
+          <p class="page-sub">View, create, and delete registered accounts</p>
+        </div>
+        <button class="btn btn-orange" onclick="openCreateUserModal()" style="display:flex;align-items:center;gap:6px;padding:10px 16px;font-size:14px;font-weight:600">
+          <span class="material-symbols-rounded" style="font-size:18px">person_add</span> Add New User
+        </button>
+      </div>
+      <div class="card">
+        <div id="users-list">
+          <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div id="section-orders" class="section">
+      <div class="page-header">
+        <h1 class="page-title">All <span class="accent">Orders</span></h1>
+        <p class="page-sub">View every order on the platform</p>
+      </div>
+      <div class="card">
+        <div id="orders-list">
+          <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drivers -->
+    <div id="section-drivers" class="section">
+      <div class="page-header">
+        <h1 class="page-title">Driver <span class="accent">Management</span></h1>
+        <p class="page-sub">Assign available drivers to pending deliveries</p>
+      </div>
+      <div id="drivers-content">
+        <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── CREATE USER MODAL ── -->
+  <div class="modal-overlay" id="create-user-overlay" style="display:none">
+    <div class="confirm-modal" style="max-width:650px;width:90%;text-align:left;border-radius:20px;padding:36px;background:var(--white);box-shadow:0 24px 50px rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.8)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid var(--gray-lt);padding-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="material-symbols-rounded" style="color:var(--orange);font-size:26px">person_add</span>
+          <h3 style="margin:0;font-size:22px;font-weight:700;color:var(--dark);letter-spacing:-0.5px">Add New User</h3>
+        </div>
+        <button onclick="closeCreateUserModal()" style="background:none;border:none;cursor:pointer;color:var(--gray);display:flex;align-items:center;padding:6px;border-radius:50%;transition:background 0.2s;outline:none" onmouseover="this.style.background='var(--gray-lt)'" onmouseout="this.style.background='none'"><span class="material-symbols-rounded" style="font-size:20px">close</span></button>
+      </div>
+      
+      <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px 16px">
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Username <span style="color:var(--orange)">*</span></label>
+          <input type="text" id="new-user-username" placeholder="Choose a unique username" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none;transition:all 0.2s;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Password <span style="color:var(--orange)">*</span></label>
+          <div style="position:relative">
+            <input type="password" id="new-user-password" placeholder="Min. 6 characters" style="width:100%;padding:12px 40px 12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none;transition:all 0.2s;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+            <button type="button" onclick="toggleNewUserPassword()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);display:flex;align-items:center;padding:4px"><span class="material-symbols-rounded" id="new-user-pw-icon" style="font-size:20px">visibility</span></button>
+          </div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Role <span style="color:var(--orange)">*</span></label>
+          <select id="new-user-role" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;background:var(--white);outline:none;transition:all 0.2s;cursor:pointer">
+            <option value="driver">Driver</option>
+            <option value="seller">Seller</option>
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Full Name</label>
+          <input type="text" id="new-user-fullname" placeholder="E.g. John Doe" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Email Address</label>
+          <input type="email" id="new-user-email" placeholder="example@email.com" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Phone Number</label>
+          <input type="text" id="new-user-phone" placeholder="E.g. 09123456789" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="grid-column: 1 / -1;margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Physical / Store Address</label>
+          <input type="text" id="new-user-address" placeholder="Enter details..." style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+      </div>
+      
+      <p id="new-user-error" style="color:var(--red);font-size:14px;margin:16px 0 0;font-weight:600;display:none;background:rgba(231,76,60,0.08);padding:10px 14px;border-radius:8px;border-left:4px solid var(--red)"></p>
+
+      <div class="confirm-actions" style="margin-top:28px;border-top:1px solid var(--gray-lt);padding-top:20px;display:flex;gap:14px">
+        <button class="btn btn-ghost" style="flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:600;transition:all 0.2s" onclick="closeCreateUserModal()">Cancel</button>
+        <button class="btn btn-orange" style="flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:700;transition:all 0.2s;box-shadow:0 4px 12px rgba(255,107,43,0.2)" onclick="submitCreateUser()">
+          Create Account
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ── EDIT USER MODAL ── -->
+  <div class="modal-overlay" id="edit-user-overlay" style="display:none">
+    <div class="confirm-modal" style="max-width:650px;width:90%;text-align:left;border-radius:20px;padding:36px;background:var(--white);box-shadow:0 24px 50px rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.8)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid var(--gray-lt);padding-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="material-symbols-rounded" style="color:var(--orange);font-size:26px">edit</span>
+          <h3 style="margin:0;font-size:22px;font-weight:700;color:var(--dark);letter-spacing:-0.5px">Edit User Details</h3>
+        </div>
+        <button onclick="closeEditUserModal()" style="background:none;border:none;cursor:pointer;color:var(--gray);display:flex;align-items:center;padding:6px;border-radius:50%;transition:background 0.2s;outline:none" onmouseover="this.style.background='var(--gray-lt)'" onmouseout="this.style.background='none'"><span class="material-symbols-rounded" style="font-size:20px">close</span></button>
+      </div>
+      
+      <input type="hidden" id="edit-user-id">
+      
+      <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px 16px">
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Username <span style="color:var(--orange)">*</span></label>
+          <input type="text" id="edit-user-username" placeholder="Choose a unique username" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none;transition:all 0.2s;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">New Password (Optional)</label>
+          <div style="position:relative">
+            <input type="password" id="edit-user-password" placeholder="Leave blank to keep current" style="width:100%;padding:12px 40px 12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none;transition:all 0.2s;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02)">
+            <button type="button" onclick="toggleEditUserPassword()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);display:flex;align-items:center;padding:4px"><span class="material-symbols-rounded" id="edit-user-pw-icon" style="font-size:20px">visibility</span></button>
+          </div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Role <span style="color:var(--orange)">*</span></label>
+          <select id="edit-user-role" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;background:var(--white);outline:none;transition:all 0.2s;cursor:pointer">
+            <option value="driver">Driver</option>
+            <option value="seller">Seller</option>
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Full Name</label>
+          <input type="text" id="edit-user-fullname" placeholder="E.g. John Doe" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Email Address</label>
+          <input type="email" id="edit-user-email" placeholder="example@email.com" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Phone Number</label>
+          <input type="text" id="edit-user-phone" placeholder="E.g. 09123456789" style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+        <div class="field-group" style="grid-column: 1 / -1;margin-bottom:0">
+          <label style="font-weight:600;font-size:13px;color:var(--dark);margin-bottom:6px;display:block">Physical / Store Address</label>
+          <input type="text" id="edit-user-address" placeholder="Enter details..." style="width:100%;padding:12px 14px;border:1px solid var(--gray-lt);border-radius:10px;font-size:15px;outline:none">
+        </div>
+      </div>
+      
+      <p id="edit-user-error" style="color:var(--red);font-size:14px;margin:16px 0 0;font-weight:600;display:none;background:rgba(231,76,60,0.08);padding:10px 14px;border-radius:8px;border-left:4px solid var(--red)"></p>
+ 
+      <div class="confirm-actions" style="margin-top:28px;border-top:1px solid var(--gray-lt);padding-top:20px;display:flex;gap:14px">
+        <button class="btn btn-ghost" style="flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:600;transition:all 0.2s" onclick="closeEditUserModal()">Cancel</button>
+        <button class="btn btn-orange" style="flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:700;transition:all 0.2s;box-shadow:0 4px 12px rgba(255,107,43,0.2)" onclick="submitEditUser()">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js?v=7"></script>
+  <script src="../js/admin.js?v=7"></script>
+  <script src="../js/sync.js?v=7"></script>
+</body>
+</html>

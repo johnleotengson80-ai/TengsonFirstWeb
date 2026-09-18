@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi Te! — Login</title>
+  <link rel="stylesheet" href="../css/shared.css?v=6">
+  <link rel="stylesheet" href="../css/style.css?v=6">
+  <link rel="stylesheet" href="../css/material-symbols.css" />
+</head>
+<body>
+  <div class="split-layout">
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="brand anim-up">
+        <div class="brand-icon">HT</div>
+        <span class="brand-name">Hi Te!</span>
+      </div>
+      <div class="hero-text anim-up">
+        <h1>Lutong Bahay,<br><span class="accent" style="color:var(--yellow)">Init Pa.</span><br>Kain na!</h1>
+        <p>Your favorite local carinderia meals, delivered right to your door in minutes.</p>
+      </div>
+      <div class="floating-cards">
+        <div class="food-card fc1">Pork Adobo <span>10 min</span></div>
+        <div class="food-card fc2">Chicken Curry <span>15 min</span></div>
+        <div class="food-card fc3">Spicy Sinuglaw <span>20 min</span></div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="auth-box anim-up">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your account</p>
+
+        <form id="loginForm">
+          <div class="field-group" style="margin-bottom:18px">
+            <label>Username</label>
+            <div class="input-wrap">
+              <span class="input-icon"><span class="material-symbols-rounded">account_circle</span></span>
+              <input type="text" id="username"
+                placeholder="Enter your username"
+                autocomplete="username" required>
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-bottom:18px">
+            <label>Password</label>
+            <!-- Password field with visibility toggle -->
+            <div class="input-wrap" style="position:relative">
+              <span class="input-icon"><span class="material-symbols-rounded">lock</span></span>
+              <input type="password" id="password"
+                placeholder="Enter your password"
+                autocomplete="current-password" required
+                style="padding-right:48px">
+              <!-- Toggle button sits inside the input field -->
+              <button type="button" class="pw-toggle"
+                onclick="togglePassword('password', this)"
+                title="Show/hide password">
+               <span class="material-symbols-rounded" style="font-size:20px;">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <p id="msg" class="auth-msg"></p>
+
+          <button type="submit" id="login-btn"
+            class="btn btn-primary btn-full btn-lg">
+            <span id="login-btn-label">Sign In</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </form>
+
+        <p class="switch-text">
+          Don't have an account? <a href="register.html">Create one</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <script src="../js/config.js?v=7"></script>
+  <script src="../js/app.js?v=7"></script>
+</body>
+</html>

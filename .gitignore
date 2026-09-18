@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.db
+.vercel/
+System(back-end)/uploads/*
+!System(back-end)/uploads/.gitkeep
+System(back-end)/local.db
+node_modules/
