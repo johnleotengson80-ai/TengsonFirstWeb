@@ -911,26 +911,49 @@ button .material-symbols-rounded {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 8px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     min-height: 56px;
+    width: 100%;
+    overflow: visible;
   }
-  .nav-brand { min-width: 0; gap: 6px; font-size: 14px; }
-  .brand-icon { width: 30px; height: 30px; font-size: 11px; }
-  .navbar .notif-bell-wrap { margin-left: 0; }
-  .notif-bell-btn { padding: 4px; }
+  .nav-brand {
+    grid-column: 1; min-width: 0; gap: 8px; font-size: 14px;
+    align-self: center; justify-self: stretch;
+  }
+  .brand-icon { width: 32px; height: 32px; font-size: 11px; flex: 0 0 32px; }
+  .navbar .notif-bell-wrap {
+    grid-column: 2; margin: 0; width: 40px; justify-self: end;
+  }
+  .notif-bell-btn { width: 40px; height: 40px; padding: 4px; }
   .notif-bell-btn .material-symbols-rounded { font-size: 22px; }
   .logout-btn {
-    min-height: 38px; padding: 7px 8px; font-size: 0;
+    grid-column: 3; min-height: 40px; width: 40px; padding: 7px;
+    font-size: 0; justify-self: end;
     white-space: nowrap;
   }
   .logout-btn .material-symbols-rounded { margin-right: 0 !important; font-size: 20px; }
+  .nav-right {
+    display: contents !important;
+  }
+  .nav-right .stat-pill { display: none; }
+  .nav-right .notif-bell-wrap { grid-column: 2; }
+  .nav-right .logout-btn { grid-column: 3; }
   .nav-tabs {
     grid-column: 1 / -1; order: 4; width: 100%;
-    min-width: 0; padding: 2px; gap: 2px;
+    min-width: 0; min-height: 42px; padding: 2px; gap: 2px;
+    justify-content: flex-start; align-items: stretch;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
   }
-  .nav-tab { flex: 0 0 auto; min-height: 38px; padding: 8px 10px; font-size: 12px; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex: 1 0 auto; min-width: 0; min-height: 38px;
+    padding: 8px 10px; font-size: 12px; line-height: 1.15;
+  }
   .page-header[style] { align-items: stretch !important; }
   .page-header[style] > div { min-width: 0; }
+  .driver-banner { position: relative; z-index: 1; }
+  .driver-banner-inner { min-width: 0; padding: 10px 12px; }
+  .driver-banner-inner span { min-width: 0; overflow-wrap: anywhere; }
 }
 
 .notif-badge.visible {
