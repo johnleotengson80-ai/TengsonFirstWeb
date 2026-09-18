@@ -747,12 +747,12 @@ button .material-symbols-rounded {
 .menu-card.hidden { display: none; }
 
 .menu-card-img {
-  width: 100%; aspect-ratio: 4 / 3; background: var(--gray-lt);
+  width: 100%; min-height: 140px; background: var(--gray-lt);
   display: flex; align-items: center; justify-content: center;
   font-size: 52px; overflow: hidden; position: relative;
 }
 .menu-card-img img {
-  width: 100%; height: 100%; object-fit: contain;
+  display: block; width: 100%; max-width: 100%; height: auto;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 

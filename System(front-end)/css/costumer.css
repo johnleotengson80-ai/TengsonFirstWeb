@@ -525,10 +525,8 @@
   background: #f5eadf;
 }
 
-/* Keep food photos in a consistent card frame without stretching or cropping. */
 .menu-card-img {
-  aspect-ratio: 4 / 3;
-  height: auto;
+  min-height: 140px;
 }
 
 .cart-sidebar {
