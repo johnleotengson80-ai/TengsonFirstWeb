@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import quote_plus
 
 from flask import Flask, send_from_directory
+from sqlalchemy import inspect, text
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
@@ -151,6 +152,10 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all()
+        product_columns = {column['name'] for column in inspect(db.engine).get_columns('products')}
+        if 'image_data' not in product_columns:
+            db.session.execute(text('ALTER TABLE products ADD COLUMN image_data TEXT'))
+            db.session.commit()
         reset_status = _reset_admin_password()
         bootstrap_status = _bootstrap_admin()
         app.logger.warning(

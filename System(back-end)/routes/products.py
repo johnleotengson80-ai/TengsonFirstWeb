@@ -1,5 +1,7 @@
 import os
 import uuid
+import base64
+import mimetypes
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models import db, Product
@@ -7,6 +9,7 @@ from realtime import broadcast
 
 products_bp  = Blueprint('products', __name__)
 ALLOWED_EXT  = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_EMBEDDED_IMAGE_BYTES = 300 * 1024
 
 
 # ── Helpers ───────────────────────────────────────────────────────────
@@ -45,6 +48,19 @@ def _save_image(file) -> str | None:
     filename = f"{uuid.uuid4().hex}.{ext}"
     file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
     return filename
+
+
+def _read_embedded_image(file) -> str | None:
+    """Return a bounded data URL for serverless storage, or None if invalid."""
+    if not file or not file.filename or not _allowed_file(file.filename):
+        return None
+    content = file.read(MAX_EMBEDDED_IMAGE_BYTES + 1)
+    file.seek(0)
+    if len(content) > MAX_EMBEDDED_IMAGE_BYTES:
+        return None
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    content_type = mimetypes.types_map.get(f'.{ext}', f'image/{ext}')
+    return f'data:{content_type};base64,{base64.b64encode(content).decode("ascii")}'
 
 
 def _delete_image(image_path: str):
@@ -129,15 +145,18 @@ def add_product():
 
     # Image handling
     image_filename = None
+    image_data = None
     if 'image' in request.files:
         file           = request.files['image']
-        if file.filename and current_app.config.get('UPLOADS_EPHEMERAL'):
-            return jsonify({
-                'error': 'Product image uploads require configured external object storage on Vercel.'
-            }), 503
-        image_filename = _save_image(file)
+        if current_app.config.get('UPLOADS_EPHEMERAL'):
+            image_data = _read_embedded_image(file)
+        else:
+            image_filename = _save_image(file)
         if file.filename and image_filename is None:
-            return jsonify({'error': 'Invalid image format. Use PNG, JPG, JPEG, GIF, or WEBP'}), 400
+            if current_app.config.get('UPLOADS_EPHEMERAL') and image_data is None:
+                return jsonify({'error': 'Image must be PNG, JPG, JPEG, GIF, or WEBP and no larger than 300 KB'}), 400
+            if not current_app.config.get('UPLOADS_EPHEMERAL'):
+                return jsonify({'error': 'Invalid image format. Use PNG, JPG, JPEG, GIF, or WEBP'}), 400
 
     new_product = Product(
         seller_id    = identity['id'],
@@ -146,6 +165,7 @@ def add_product():
         category     = category,
         price        = price,
         image_path   = image_filename,
+        image_data   = image_data,
         quantity     = quantity,
         is_available = quantity > 0,
     )
@@ -209,16 +229,21 @@ def update_product(product_id):
     # Handle new image
     if 'image' in request.files:
         file     = request.files['image']
-        if file.filename and current_app.config.get('UPLOADS_EPHEMERAL'):
-            return jsonify({
-                'error': 'Product image uploads require configured external object storage on Vercel.'
-            }), 503
-        new_name = _save_image(file)
-        if file.filename and new_name is None:
-            return jsonify({'error': 'Invalid image format'}), 400
-        if new_name:
-            _delete_image(product.image_path)
-            product.image_path = new_name
+        if current_app.config.get('UPLOADS_EPHEMERAL'):
+            new_data = _read_embedded_image(file)
+            if file.filename and new_data is None:
+                return jsonify({'error': 'Image must be PNG, JPG, JPEG, GIF, or WEBP and no larger than 300 KB'}), 400
+            if new_data:
+                product.image_data = new_data
+                product.image_path = None
+        else:
+            new_name = _save_image(file)
+            if file.filename and new_name is None:
+                return jsonify({'error': 'Invalid image format'}), 400
+            if new_name:
+                _delete_image(product.image_path)
+                product.image_path = new_name
+                product.image_data = None
 
     try:
         db.session.commit()

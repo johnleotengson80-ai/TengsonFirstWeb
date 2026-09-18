@@ -51,6 +51,7 @@ class Product(db.Model):
     category     = db.Column(db.String(50))
     price        = db.Column(db.Numeric(10,2), nullable=False)
     image_path   = db.Column(db.String(255))
+    image_data   = db.Column(db.Text)
     is_available = db.Column(db.Boolean, default=True)
     quantity     = db.Column(db.Integer, default=0)
     created_at   = db.Column(db.DateTime, default=datetime.utcnow)
@@ -69,7 +70,7 @@ class Product(db.Model):
             'description':  self.description,
             'category':     self.category,
             'price':        float(self.price),
-            'image_url':    f'/uploads/{self.image_path}' if self.image_path else None,
+            'image_url':    self.image_data or (f'/uploads/{self.image_path}' if self.image_path else None),
             'is_available': self.is_available,
             'quantity':     self.quantity,
             'created_at':   self.created_at.isoformat(),
