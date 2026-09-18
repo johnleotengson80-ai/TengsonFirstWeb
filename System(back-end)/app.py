@@ -8,8 +8,9 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+import bcrypt
 
-from models import db
+from models import db, User
 from routes.auth import auth_bp
 from routes.products import products_bp
 from routes.orders import orders_bp
@@ -59,6 +60,41 @@ def _cors_origins():
     return [origin.strip() for origin in raw.split(',') if origin.strip()]
 
 
+def _bootstrap_admin():
+    username = (os.getenv('BOOTSTRAP_ADMIN_USERNAME') or '').strip()
+    password = os.getenv('BOOTSTRAP_ADMIN_PASSWORD')
+    if not username and not password:
+        return
+    if not username or not password:
+        raise RuntimeError(
+            'BOOTSTRAP_ADMIN_USERNAME and BOOTSTRAP_ADMIN_PASSWORD must be set together.'
+        )
+    password_bytes = password.encode('utf-8')
+    if not password_bytes or len(password_bytes) > 72:
+        raise RuntimeError('BOOTSTRAP_ADMIN_PASSWORD must be between 1 and 72 UTF-8 bytes.')
+
+    if User.query.filter_by(username=username).first():
+        return
+
+    email = (os.getenv('BOOTSTRAP_ADMIN_EMAIL') or '').strip() or None
+    if email and User.query.filter_by(email=email).first():
+        raise RuntimeError('BOOTSTRAP_ADMIN_EMAIL is already used by another account.')
+
+    admin = User(
+        username=username,
+        password_hash=bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8'),
+        role='admin',
+        full_name=(os.getenv('BOOTSTRAP_ADMIN_FULL_NAME') or '').strip() or None,
+        email=email,
+    )
+    db.session.add(admin)
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        raise RuntimeError('Bootstrap admin creation failed.') from error
+
+
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = _database_uri()
@@ -77,6 +113,7 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all()
+        _bootstrap_admin()
 
     CORS(
         app,

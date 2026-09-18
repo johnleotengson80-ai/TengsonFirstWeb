@@ -12,6 +12,12 @@ Set these for **Production**, **Preview**, and any environment where the API run
 
 Do not deploy the local `.env`; it is ignored by git. Copy `.env.example` only as a configuration reference.
 
+## One-time first-admin bootstrap
+
+Public registration always creates customer accounts. To create the first admin, temporarily add `BOOTSTRAP_ADMIN_USERNAME` and `BOOTSTRAP_ADMIN_PASSWORD` in Vercel, with optional `BOOTSTRAP_ADMIN_FULL_NAME` and `BOOTSTRAP_ADMIN_EMAIL`, then redeploy once. On startup after `db.create_all()`, the app checks for the configured username and creates an admin only when no matching username exists; the password is bcrypt-hashed and never logged. Verify that the admin can log in, remove `BOOTSTRAP_ADMIN_PASSWORD` (and the other bootstrap variables if no longer needed), and redeploy. Existing admin accounts are not changed by later startups.
+
+After signing in, the existing admin users endpoint/dashboard can create seller and driver accounts (as well as customer or admin accounts). Do not use public registration to create privileged roles.
+
 ## Limitations and setup
 
 Vercel functions are stateless and have ephemeral filesystems. Product images written to `/tmp/uploads` can disappear between invocations, so durable uploads require an external object-storage service and a small change to `_save_image` in `System(back-end)/routes/products.py`. The current SSE implementation is process-local and is not durable or shared across serverless instances; dashboards retain their existing polling refresh and SSE should be treated as best-effort notifications.
