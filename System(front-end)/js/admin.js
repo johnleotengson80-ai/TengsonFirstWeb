@@ -1,8 +1,8 @@
 const API = window.API_BASE_URL;
 
-// ── ADMIN TOKEN ───────────────────────────────────────────────────────
-const getToken = () => localStorage.getItem('token_admin');
-const getUser  = () => JSON.parse(localStorage.getItem('user_admin') || '{}');
+// ── SHARED AUTH STORAGE ──────────────────────────────────────────────
+const getToken = () => localStorage.getItem('token');
+const getUser  = () => JSON.parse(localStorage.getItem('user') || '{}');
 
 // ── Chart Instances ───────────────────────────────────────────────────
 let weekChartInstance      = null;
@@ -73,16 +73,16 @@ function handleUnauthorized() {
   showToast('⚠️ Session expired', 'error', 2000);
 
   setTimeout(() => {
-    localStorage.removeItem('token_admin');
-    localStorage.removeItem('user_admin');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     location.href = '../html/index.html';
   }, 2000);
 }
 
 // ── Logout ────────────────────────────────────────────────────────────
 function logout() {
-  localStorage.removeItem('token_admin');
-  localStorage.removeItem('user_admin');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 
   showToast('👋 Logged out', 'success');
 
