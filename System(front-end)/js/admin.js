@@ -945,15 +945,168 @@ async function loadUsers() {
 
       <button
         class="btn btn-red btn-sm"
+        onclick="openEditUserModal(${JSON.stringify(u).replace(/"/g, '&quot;')})">
+        ✏️ Edit
+      </button>
+      <button
+        class="btn btn-red btn-sm"
         onclick="deleteUser(${u.id}, '${u.username.replace(/'/g, "\\'")}')">
-
         🗑️ Delete
-
       </button>
 
     </div>
 
   `).join('');
+}
+
+// ── User modal helpers ───────────────────────────────────────────────
+function userField(id) {
+  return document.getElementById(id);
+}
+
+function setUserModalError(id, message) {
+  const error = userField(id);
+  if (!error) return;
+  error.textContent = message || '';
+  error.style.display = message ? 'block' : 'none';
+}
+
+function openCreateUserModal() {
+  const overlay = userField('create-user-overlay');
+  if (!overlay) return;
+  ['username', 'password', 'fullname', 'email', 'phone', 'address']
+    .forEach(field => {
+      const input = userField(`new-user-${field}`);
+      if (input) input.value = '';
+    });
+  const role = userField('new-user-role');
+  if (role) role.value = 'driver';
+  const password = userField('new-user-password');
+  if (password) password.type = 'password';
+  const icon = userField('new-user-pw-icon');
+  if (icon) icon.textContent = 'visibility';
+  setUserModalError('new-user-error', '');
+  overlay.style.display = 'flex';
+  userField('new-user-username')?.focus();
+}
+
+function closeCreateUserModal() {
+  const overlay = userField('create-user-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function toggleNewUserPassword() {
+  const input = userField('new-user-password');
+  const icon = userField('new-user-pw-icon');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+  if (icon) icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+}
+
+async function submitCreateUser() {
+  const username = userField('new-user-username')?.value.trim() || '';
+  const password = userField('new-user-password')?.value || '';
+  const role = userField('new-user-role')?.value || 'customer';
+  const errorId = 'new-user-error';
+
+  if (!username || !password) {
+    setUserModalError(errorId, 'Username and password are required.');
+    return;
+  }
+  if (password.length < 6) {
+    setUserModalError(errorId, 'Password must be at least 6 characters.');
+    return;
+  }
+
+  const data = await apiCall(`${API}/admin/users`, {
+    method: 'POST',
+    body: JSON.stringify({
+      username,
+      password,
+      role,
+      full_name: userField('new-user-fullname')?.value.trim() || '',
+      email: userField('new-user-email')?.value.trim() || '',
+      phone: userField('new-user-phone')?.value.trim() || '',
+      address: userField('new-user-address')?.value.trim() || ''
+    })
+  });
+
+  if (!data) return;
+  closeCreateUserModal();
+  showToast(`✅ ${data.message || 'User created successfully.'}`, 'success');
+  loadUsers();
+  loadStats();
+}
+
+function openEditUserModal(user) {
+  if (!user) return;
+  const values = {
+    id: user.id,
+    username: user.username,
+    role: user.role,
+    full_name: user.full_name || '',
+    email: user.email || '',
+    phone: user.phone || '',
+    address: user.address || ''
+  };
+  Object.entries(values).forEach(([field, value]) => {
+    const input = userField(`edit-user-${field}`);
+    if (input) input.value = value;
+  });
+  const password = userField('edit-user-password');
+  if (password) password.value = '';
+  setUserModalError('edit-user-error', '');
+  const overlay = userField('edit-user-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  userField('edit-user-username')?.focus();
+}
+
+function closeEditUserModal() {
+  const overlay = userField('edit-user-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function toggleEditUserPassword() {
+  const input = userField('edit-user-password');
+  const icon = userField('edit-user-pw-icon');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+  if (icon) icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
+}
+
+async function submitEditUser() {
+  const userId = userField('edit-user-id')?.value;
+  const username = userField('edit-user-username')?.value.trim() || '';
+  const password = userField('edit-user-password')?.value || '';
+  const errorId = 'edit-user-error';
+
+  if (!userId || !username) {
+    setUserModalError(errorId, 'Username is required.');
+    return;
+  }
+  if (password && password.length < 6) {
+    setUserModalError(errorId, 'Password must be at least 6 characters.');
+    return;
+  }
+
+  const data = await apiCall(`${API}/admin/users/${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      username,
+      password,
+      role: userField('edit-user-role')?.value || '',
+      full_name: userField('edit-user-fullname')?.value.trim() || '',
+      email: userField('edit-user-email')?.value.trim() || '',
+      phone: userField('edit-user-phone')?.value.trim() || '',
+      address: userField('edit-user-address')?.value.trim() || ''
+    })
+  });
+
+  if (!data) return;
+  closeEditUserModal();
+  showToast(`✅ ${data.message || 'User updated successfully.'}`, 'success');
+  loadUsers();
+  loadStats();
 }
 
 // ── Delete User ───────────────────────────────────────────────────────
