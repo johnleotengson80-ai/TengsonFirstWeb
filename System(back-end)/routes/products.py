@@ -131,6 +131,10 @@ def add_product():
     image_filename = None
     if 'image' in request.files:
         file           = request.files['image']
+        if file.filename and current_app.config.get('UPLOADS_EPHEMERAL'):
+            return jsonify({
+                'error': 'Product image uploads require configured external object storage on Vercel.'
+            }), 503
         image_filename = _save_image(file)
         if file.filename and image_filename is None:
             return jsonify({'error': 'Invalid image format. Use PNG, JPG, JPEG, GIF, or WEBP'}), 400
@@ -205,6 +209,10 @@ def update_product(product_id):
     # Handle new image
     if 'image' in request.files:
         file     = request.files['image']
+        if file.filename and current_app.config.get('UPLOADS_EPHEMERAL'):
+            return jsonify({
+                'error': 'Product image uploads require configured external object storage on Vercel.'
+            }), 503
         new_name = _save_image(file)
         if file.filename and new_name is None:
             return jsonify({'error': 'Invalid image format'}), 400

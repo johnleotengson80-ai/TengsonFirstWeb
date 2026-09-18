@@ -140,6 +140,10 @@ def create_app():
     if not upload_folder:
         upload_folder = '/tmp/uploads' if os.getenv('VERCEL') else str(Path(__file__).with_name('uploads'))
     app.config['UPLOAD_FOLDER'] = upload_folder
+    app.config['UPLOADS_EPHEMERAL'] = (
+        bool(os.getenv('VERCEL'))
+        and os.getenv('ALLOW_EPHEMERAL_UPLOADS', '').strip().lower() != 'true'
+    )
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
     os.makedirs(upload_folder, exist_ok=True)
 
