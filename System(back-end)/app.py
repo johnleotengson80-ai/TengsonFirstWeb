@@ -64,7 +64,7 @@ def _bootstrap_admin():
     username = (os.getenv('BOOTSTRAP_ADMIN_USERNAME') or '').strip()
     password = os.getenv('BOOTSTRAP_ADMIN_PASSWORD')
     if not username and not password:
-        return
+        return 'disabled'
     if not username or not password:
         raise RuntimeError(
             'BOOTSTRAP_ADMIN_USERNAME and BOOTSTRAP_ADMIN_PASSWORD must be set together.'
@@ -73,8 +73,9 @@ def _bootstrap_admin():
     if not password_bytes or len(password_bytes) > 72:
         raise RuntimeError('BOOTSTRAP_ADMIN_PASSWORD must be between 1 and 72 UTF-8 bytes.')
 
-    if User.query.filter_by(username=username).first():
-        return
+    existing = User.query.filter_by(username=username).first()
+    if existing:
+        return f'existing:{existing.role}'
 
     email = (os.getenv('BOOTSTRAP_ADMIN_EMAIL') or '').strip() or None
     if email and User.query.filter_by(email=email).first():
@@ -93,6 +94,7 @@ def _bootstrap_admin():
     except Exception as error:
         db.session.rollback()
         raise RuntimeError('Bootstrap admin creation failed.') from error
+    return 'created'
 
 
 def create_app():
@@ -113,7 +115,13 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all()
-        _bootstrap_admin()
+        bootstrap_status = _bootstrap_admin()
+        app.logger.warning(
+            '[bootstrap] status=%s username_present=%s password_present=%s',
+            bootstrap_status,
+            bool(os.getenv('BOOTSTRAP_ADMIN_USERNAME')),
+            bool(os.getenv('BOOTSTRAP_ADMIN_PASSWORD')),
+        )
 
     CORS(
         app,
