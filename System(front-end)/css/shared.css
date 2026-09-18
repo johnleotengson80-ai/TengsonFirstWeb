@@ -291,10 +291,18 @@ input::placeholder, textarea::placeholder { color: var(--gray-md); }
 /* Mobile foundation: keep controls reachable without changing desktop layout. */
 @media (max-width: 768px) {
   html { overflow-x: hidden; }
-  body { min-width: 320px; overflow-x: hidden; }
+  body { min-width: 0; overflow-x: hidden; }
   .navbar {
     min-height: 64px; height: auto; padding: 10px 14px;
     flex-wrap: wrap; align-items: center;
+  }
+  .navbar > *, .nav-brand, .nav-right, .page-header > *,
+  .menu-card, .menu-card-body, .menu-card-actions,
+  .product-card, .product-info, .product-actions {
+    min-width: 0;
+  }
+  .nav-brand > span:not(.role-chip) {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .nav-brand { font-size: 16px; }
   .role-chip { padding: 4px 8px; }
@@ -319,6 +327,9 @@ input::placeholder, textarea::placeholder { color: var(--gray-md); }
   .status-progress { overflow-x: auto; padding-bottom: 4px; }
   .status-step { min-width: 62px; }
   .status-step-label { white-space: normal; }
+  .menu-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .menu-card-actions { flex-wrap: wrap; }
+  .menu-card-actions > * { min-width: 0; }
 }
 
 @media (max-width: 480px) {
@@ -331,6 +342,11 @@ input::placeholder, textarea::placeholder { color: var(--gray-md); }
   .order-amounts { gap: 8px 14px; }
   .order-actions { width: 100%; }
   .order-actions > * { flex: 1 1 100%; }
+  .menu-cards-grid { grid-template-columns: minmax(0, 1fr); }
+  .menu-card-name { overflow-wrap: anywhere; }
+  .menu-card-actions { flex-direction: column; }
+  .menu-card-actions > * { width: 100%; }
+  .btn, .add-btn, .reviews-btn { white-space: normal; max-width: 100%; }
 }
 
 /* ── Auth message types ────────────────────────────────────────── */
