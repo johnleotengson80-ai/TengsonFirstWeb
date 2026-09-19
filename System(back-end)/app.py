@@ -148,6 +148,10 @@ def create_app():
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
     os.makedirs(upload_folder, exist_ok=True)
 
+    @app.errorhandler(413)
+    def request_entity_too_large(_error):
+        return jsonify({'error': 'Image upload is too large. Please choose an image under 5 MB.'}), 413
+
     db.init_app(app)
     JWTManager(app)
     with app.app_context():

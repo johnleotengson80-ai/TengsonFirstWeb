@@ -9,6 +9,45 @@ let editingId = null;
 let deletingId = null;
 
 let _sellerRefreshing = false;
+const MAX_EMBEDDED_IMAGE_BYTES = 280 * 1024;
+const MAX_SOURCE_IMAGE_BYTES = 20 * 1024 * 1024;
+const PRODUCT_IMAGE_EXTENSIONS = /\.(png|jpe?g|gif|webp)$/i;
+
+function compressProductImage(file) {
+  if (!file || file.size <= MAX_EMBEDDED_IMAGE_BYTES) return Promise.resolve(file);
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      if (!context) { reject(new Error('Image compression is unavailable in this browser.')); return; }
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      let quality = 0.86;
+      const attempt = () => canvas.toBlob((blob) => {
+        if (!blob) { reject(new Error('Could not process this image.')); return; }
+        if (blob.size <= MAX_EMBEDDED_IMAGE_BYTES || quality <= 0.5) {
+          if (blob.size > MAX_EMBEDDED_IMAGE_BYTES) {
+            reject(new Error('This image is still too large after compression. Please choose a smaller image.'));
+            return;
+          }
+          resolve(new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.jpg`, { type: 'image/jpeg' }));
+          return;
+        }
+        quality -= 0.1;
+        attempt();
+      }, 'image/jpeg', quality);
+      attempt();
+    };
+    image.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Could not read this image.')); };
+    image.src = objectUrl;
+  });
+}
+
 function refreshAllData() {
   if (!getToken()) { location.href = '../html/index.html'; return; }
   if (_sellerRefreshing) return;
@@ -71,7 +110,12 @@ function setupUpload() {
   input.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast('Image too large. Max 5MB.', 'error'); return; }
+    if (!PRODUCT_IMAGE_EXTENSIONS.test(file.name)) {
+      showToast('Use a PNG, JPG, JPEG, GIF, or WEBP image.', 'error');
+      input.value = '';
+      return;
+    }
+    if (file.size > MAX_SOURCE_IMAGE_BYTES) { showToast('Image too large. Max 20MB before compression.', 'error'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
       document.getElementById('upload-placeholder').style.display = 'none';
@@ -445,17 +489,20 @@ async function submitProduct() {
   document.getElementById('submit-arrow').textContent = '⏳';
 
   try {
+    showFormMsg(file && file.size > MAX_EMBEDDED_IMAGE_BYTES ? 'Optimizing image...' : (editingId?'Updating...':'Adding...'),'');
+    const uploadFile = file ? await compressProductImage(file) : null;
+    if (uploadFile) formData.set('image', uploadFile);
     const url    = editingId?`${API}/products/${editingId}`:`${API}/products/`;
     const method = editingId?'PUT':'POST';
     const res    = await fetch(url,{method,headers:{'Authorization':`Bearer ${getToken()}`},body:formData});
     const data   = await res.json();
-    if (!res.ok) { showFormMsg(data.error||'Failed.','error'); return; }
+    if (!res.ok) { showFormMsg(data.error||`Save failed (HTTP ${res.status}).`,'error'); return; }
     showFormMsg(editingId?'✅ Product updated!':'✅ Product added!','success');
     setTimeout(() => {
       resetForm(); loadProducts();
       showTab('menu', document.querySelectorAll('.nav-tab')[1]);
     }, 1000);
-  } catch (err) { showFormMsg('Cannot connect to server.','error'); }
+  } catch (err) { showFormMsg(err.message || 'Cannot save product. Please try again.','error'); }
   finally { btn.disabled=false; document.getElementById('submit-arrow').textContent='→'; }
 }
 
