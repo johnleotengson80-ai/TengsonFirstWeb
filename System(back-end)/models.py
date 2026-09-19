@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.mysql import LONGTEXT
 from datetime import datetime
 
 db = SQLAlchemy()
@@ -51,7 +52,7 @@ class Product(db.Model):
     category     = db.Column(db.String(50))
     price        = db.Column(db.Numeric(10,2), nullable=False)
     image_path   = db.Column(db.String(255))
-    image_data   = db.Column(db.Text)
+    image_data   = db.Column(db.Text().with_variant(LONGTEXT(), 'mysql'))
     is_available = db.Column(db.Boolean, default=True)
     quantity     = db.Column(db.Integer, default=0)
     created_at   = db.Column(db.DateTime, default=datetime.utcnow)
