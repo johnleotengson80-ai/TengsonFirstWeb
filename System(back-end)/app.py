@@ -156,10 +156,19 @@ def create_app():
     JWTManager(app)
     with app.app_context():
         db.create_all()
-        product_columns = {column['name'] for column in inspect(db.engine).get_columns('products')}
+        product_columns = {
+            column['name']: column for column in inspect(db.engine).get_columns('products')
+        }
         if 'image_data' not in product_columns:
-            db.session.execute(text('ALTER TABLE products ADD COLUMN image_data TEXT'))
+            db.session.execute(text('ALTER TABLE products ADD COLUMN image_data LONGTEXT'))
             db.session.commit()
+        else:
+            # Older deployments created this column as TEXT (64 KB max), which is too
+            # small for a base64-encoded photo. Widen it to LONGTEXT if needed.
+            existing_type = str(product_columns['image_data']['type']).upper()
+            if existing_type not in ('LONGTEXT', 'MEDIUMTEXT'):
+                db.session.execute(text('ALTER TABLE products MODIFY COLUMN image_data LONGTEXT'))
+                db.session.commit()
         reset_status = _reset_admin_password()
         bootstrap_status = _bootstrap_admin()
         app.logger.warning(
