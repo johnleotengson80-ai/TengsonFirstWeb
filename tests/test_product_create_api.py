@@ -81,6 +81,27 @@ class ProductCreateApiTests(unittest.TestCase):
         self.assertTrue(product['image_url'].startswith('data:image/jpeg;base64,'))
         self.assertGreater(len(product['image_url'].encode()), 65_535)
 
+    def test_local_login_page_and_assets_are_served_same_origin(self):
+        page = self.client.get('/')
+        self.assertEqual(page.status_code, 200)
+        self.assertIn(b'id="loginForm"', page.data)
+        page.close()
+
+        for asset_path in (
+            '/html/register.html',
+            '/css/shared.css',
+            '/js/config.js',
+            '/js/app.js',
+        ):
+            with self.subTest(asset=asset_path):
+                response = self.client.get(asset_path)
+                self.assertEqual(response.status_code, 200)
+                response.close()
+
+        health = self.client.get('/api/health')
+        self.assertEqual(health.status_code, 200)
+        self.assertEqual(health.get_json()['status'], 'ok')
+
     def test_invalid_payloads_return_actionable_json_errors(self):
         missing_name = self.client.post(
             '/api/products/',

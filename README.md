@@ -2,6 +2,10 @@
 
 This project contains a static HTML frontend and a Flask API. `vercel.json` serves the frontend from `System(front-end)` and routes `/api/*` and `/uploads/*` to the Python function in `api/index.py`. Browser API calls are same-origin in deployment; local development can override `window.API_BASE_URL` in `System(front-end)/js/config.js`.
 
+## Local development
+
+Install the backend dependencies from `System(back-end)/requirements.txt`, then run `python System(back-end)/app.py` from the repository root. Open `http://127.0.0.1:5000/` in the browser; Flask serves the local frontend and API on the same origin. Do not open `System(front-end)/html/index.html` directly as a `file://` URL: browsers give file pages an opaque origin and block their API calls. For local runs the app uses `System(back-end)/local.db` unless database environment variables are configured.
+
 ## Required Vercel environment variables
 
 Set these for **Production**, **Preview**, and any environment where the API runs:

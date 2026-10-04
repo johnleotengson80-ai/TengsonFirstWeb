@@ -80,8 +80,10 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     }, 600);
 
   } catch (err) {
-    // This catches network errors (e.g., if your Flask server isn't running or WiFi drops)
-    showMsg('Cannot reach server. Is Flask running?', 'error');
+    const detail = err instanceof TypeError
+      ? `Cannot reach the API at ${API}. For local use, start Flask and open http://127.0.0.1:5000/ (not the HTML file directly).`
+      : `The API response could not be read: ${err.message}`;
+    showMsg(detail, 'error');
     console.error('login error:', err);
   } finally {
     // STEP 9: Cleanup. 

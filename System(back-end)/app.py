@@ -132,6 +132,7 @@ def _reset_admin_password():
 
 def create_app():
     app = Flask(__name__)
+    frontend_dir = Path(__file__).resolve().parents[1] / 'System(front-end)'
     app.config['SQLALCHEMY_DATABASE_URI'] = _database_uri()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = _jwt_secret()
@@ -204,8 +205,34 @@ def create_app():
     def uploaded_file(filename):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+    @app.route('/html/<path:filename>')
+    def local_frontend_html(filename):
+        return send_from_directory(frontend_dir / 'html', filename)
+
+    @app.route('/css/<path:filename>')
+    def local_frontend_css(filename):
+        return send_from_directory(frontend_dir / 'css', filename)
+
+    @app.route('/js/<path:filename>')
+    def local_frontend_js(filename):
+        return send_from_directory(frontend_dir / 'js', filename)
+
+    @app.route('/fonts/<path:filename>')
+    def local_frontend_fonts(filename):
+        return send_from_directory(frontend_dir / 'fonts', filename)
+
+    @app.route('/<page>.html')
+    def local_frontend_page(page):
+        if page not in {'index', 'register', 'admin', 'driver', 'seller', 'costumer', 'customer'}:
+            return {'error': 'Not found'}, 404
+        return send_from_directory(frontend_dir / 'html', f'{page}.html')
+
     @app.route('/')
     def index():
+        return send_from_directory(frontend_dir / 'html', 'index.html')
+
+    @app.route('/api/health')
+    def health():
         return {'message': 'Hi Te! API is running', 'status': 'ok'}
 
     @app.route('/api/')
