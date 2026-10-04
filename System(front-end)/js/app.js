@@ -52,11 +52,20 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     });
     
     // STEP 6: Read the Backend's Response.
-    const data = await res.json();
+    const responseText = await res.text();
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch {
+      data = {
+        error: `API returned HTTP ${res.status} (${res.headers.get('content-type') || 'unknown response'}): ${responseText.trim().slice(0, 280)}`
+      };
+    }
 
     if (!res.ok) {
       // If the backend sent an error (like 401 Unauthorized), show it on the screen.
-      showMsg(data.error || 'Invalid username or password.', 'error');
+      const details = data.details ? ` ${data.details}` : '';
+      showMsg(`${data.error || `Request failed (HTTP ${res.status}).`}${details}`, 'error');
       return;
     }
 
