@@ -39,7 +39,12 @@ try:
 
     app = create_app()
 except RuntimeError as error:
-    app = _startup_failure('API configuration is incomplete', type(error).__name__, str(error))
+    details = str(error)
+    if 'must be configured' in details or 'must be at least' in details:
+        message = 'API configuration is incomplete'
+    else:
+        message = 'API startup failed'
+    app = _startup_failure(message, type(error).__name__, details)
 except SQLAlchemyError as error:
     details = (
         f'{type(error).__name__}: check DATABASE_URL, database connectivity, '
