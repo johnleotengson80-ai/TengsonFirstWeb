@@ -4,7 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 from urllib.parse import quote_plus
 
-from flask import Flask, send_from_directory
+from flask import Flask, jsonify, send_from_directory
 from sqlalchemy import inspect, text
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -162,7 +162,7 @@ def create_app():
         if 'image_data' not in product_columns:
             db.session.execute(text('ALTER TABLE products ADD COLUMN image_data LONGTEXT'))
             db.session.commit()
-        else:
+        elif db.engine.dialect.name == 'mysql':
             # Older deployments created this column as TEXT (64 KB max), which is too
             # small for a base64-encoded photo. Widen it to LONGTEXT if needed.
             existing_type = str(product_columns['image_data']['type']).upper()

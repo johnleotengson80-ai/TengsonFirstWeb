@@ -173,8 +173,13 @@ def add_product():
     try:
         db.session.add(new_product)
         db.session.commit()
-    except Exception:
+    except Exception as error:
         db.session.rollback()
+        current_app.logger.error(
+            'Product creation failed for seller_id=%s exception_type=%s',
+            identity['id'],
+            type(error).__name__,
+        )
         return jsonify({'error': 'Could not save product. Please try again.'}), 500
 
     broadcast('product_updated', {'product_id': new_product.id, 'seller_id': identity['id']})

@@ -495,8 +495,14 @@ async function submitProduct() {
     const url    = editingId?`${API}/products/${editingId}`:`${API}/products/`;
     const method = editingId?'PUT':'POST';
     const res    = await fetch(url,{method,headers:{'Authorization':`Bearer ${getToken()}`},body:formData});
-    const data   = await res.json();
-    if (!res.ok) { showFormMsg(data.error||`Save failed (HTTP ${res.status}).`,'error'); return; }
+    const responseText = await res.text();
+    let data = {};
+    try { data = responseText ? JSON.parse(responseText) : {}; }
+    catch { data = { error: responseText.trim() }; }
+    if (!res.ok) {
+      showFormMsg(data.error || `Save failed (HTTP ${res.status}).`,'error');
+      return;
+    }
     showFormMsg(editingId?'✅ Product updated!':'✅ Product added!','success');
     setTimeout(() => {
       resetForm(); loadProducts();
