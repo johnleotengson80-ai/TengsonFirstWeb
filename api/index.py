@@ -11,22 +11,27 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 
+app = Flask(__name__)
+
+@app.route(
+    '/', defaults={'path': ''},
+    methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+)
+@app.route(
+    '/<path:path>',
+    methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+)
+def startup_error(path):
+    return jsonify({'error': 'API startup is not initialized'}), 503
+
+
 def _startup_failure(message, error_name, details):
-    failed_app = Flask(__name__)
-    failed_app.logger.error('API startup failed: %s', error_name)
-
-    @failed_app.route(
-        '/', defaults={'path': ''},
-        methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    app.logger.error('API startup failed: %s', error_name)
+    app.view_functions['startup_error'] = lambda path: (
+        jsonify({'error': message, 'details': details}),
+        503,
     )
-    @failed_app.route(
-        '/<path:path>',
-        methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    )
-    def startup_error(path):
-        return jsonify({'error': message, 'details': details}), 503
-
-    return failed_app
+    return app
 
 
 try:
